@@ -284,9 +284,11 @@ auth_dontaudit_getattr_shadow(container_runtime_domain)
 
 init_read_state(container_runtime_domain)
 init_status(container_runtime_domain)
-init_stop(container_runtime_domain)
-init_start(container_runtime_domain)
-init_manage_config_transient_files(container_runtime_domain)
+ifdef(`redhat', `
+  init_stop(container_runtime_domain)
+  init_start(container_runtime_domain)
+  init_manage_config_transient_files(container_runtime_domain)
+')
 
 logging_send_audit_msgs(container_runtime_domain)
 
@@ -419,7 +421,9 @@ modutils_domtrans_kmod(container_runtime_domain)
 systemd_status_all_unit_files(container_runtime_domain)
 systemd_start_systemd_services(container_runtime_domain)
 systemd_dbus_chat_logind(container_runtime_domain)
-systemd_dbus_chat_resolved(container_runtime_domain)
+ifdef(`init_systemd', `
+  systemd_dbus_chat_resolved(container_runtime_domain)
+')
 
 userdom_stream_connect(container_runtime_domain)
 userdom_search_user_home_content(container_runtime_domain)
@@ -705,7 +709,11 @@ dev_list_sysfs(container_domain)
 allow container_domain self:key manage_key_perms;
 dontaudit container_domain container_domain:key search;
 
-allow container_domain self:process { getrlimit getattr signal_perms getsched getpgid getcap setsched setcap setpgid setrlimit };
+allow container_domain self:process { getattr signal_perms getsched getpgid getcap setsched setcap setpgid setrlimit };
+ifdef(`redhat', `
+  allow container_domain self:process getrlimit;
+')
+
 allow container_domain self:fifo_file manage_file_perms;
 allow container_domain self:msg all_msg_perms;
 allow container_domain self:sem create_sem_perms;
