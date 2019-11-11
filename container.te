@@ -284,6 +284,7 @@ auth_dontaudit_getattr_shadow(container_runtime_domain)
 
 init_read_state(container_runtime_domain)
 init_status(container_runtime_domain)
+
 ifdef(`redhat', `
   init_stop(container_runtime_domain)
   init_start(container_runtime_domain)
@@ -710,7 +711,7 @@ allow container_domain self:key manage_key_perms;
 dontaudit container_domain container_domain:key search;
 
 allow container_domain self:process { getattr signal_perms getsched getpgid getcap setsched setcap setpgid setrlimit };
-ifdef(`redhat', `
+ifdef(`fedora', `
   allow container_domain self:process getrlimit;
 ')
 
