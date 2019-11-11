@@ -853,8 +853,66 @@ interface(`container_spc_rw_pipes',`
 ')
 
 #######################################
-## Compatibility layer with redhat/fedora
+## Compatibility layer with the fedora branch
 #
+
+########################################
+## <summary>
+##	Dontaudit link of process kernel keyrings
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to dontaudit.
+##	</summary>
+## </param>
+#
+interface(`domain_dontaudit_link_all_domains_keyrings',`
+	gen_require(`
+		attribute domain;
+	')
+
+	dontaudit $1 domain:key link;
+')
+
+########################################
+## <summary>
+##	Dontaudit search of process kernel keyrings
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to dontaudit.
+##	</summary>
+## </param>
+#
+interface(`domain_dontaudit_search_all_domains_keyrings',`
+	gen_require(`
+		attribute domain;
+	')
+
+	dontaudit $1 domain:key search;
+')
+
+########################################
+## <summary>
+##	Send and receive messages from
+##	systemd resolved over dbus.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`systemd_dbus_chat_resolved',`
+	gen_require(`
+		type systemd_resolved_t;
+		class dbus send_msg;
+	')
+
+	allow $1 systemd_resolved_t:dbus send_msg;
+	allow systemd_resolved_t $1:dbus send_msg;
+	ps_process_pattern(systemd_resolved_t, $1)
+')
 
 ########################################
 ## <summary>
