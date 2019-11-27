@@ -202,6 +202,8 @@ interface(`container_manage_share_files',`
 	list_dirs_pattern($1, container_share_t, container_share_t)
 	manage_files_pattern($1, container_share_t, container_share_t)
 	manage_lnk_files_pattern($1, container_share_t, container_share_t)
+	manage_blk_files_pattern($1, container_share_t, container_share_t)
+	manage_chr_files_pattern($1, container_share_t, container_share_t)
 ')
 
 ########################################
@@ -298,6 +300,7 @@ interface(`container_manage_files',`
 
 	manage_files_pattern($1, container_file_t, container_file_t)
 	manage_lnk_files_pattern($1, container_file_t, container_file_t)
+	manage_sock_files_pattern($1, container_file_t, container_file_t)
 ')
 
 ########################################
@@ -335,6 +338,25 @@ interface(`container_manage_lib_dirs',`
 
 	files_search_var_lib($1)
 	manage_dirs_pattern($1, container_var_lib_t, container_var_lib_t)
+')
+
+########################################
+## <summary>
+##	Manage container log files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`container_manage_log_files',`
+	gen_require(`
+		type container_log_t;
+	')
+
+	list_dirs_pattern($1, container_log_t, container_log_t)
+	manage_files_pattern($1, container_log_t, container_log_t)
 ')
 
 ########################################
