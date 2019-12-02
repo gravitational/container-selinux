@@ -416,12 +416,7 @@ term_use_ptmx(container_runtime_domain)
 term_getattr_pty_fs(container_runtime_domain)
 term_relabel_pty_fs(container_runtime_domain)
 term_mounton_unallocated_ttys(container_runtime_domain)
-
-ifdef(`distro_fedora', `
-  modutils_domtrans_kmod(container_runtime_domain)
-', `
-  modutils_domtrans_insmod(container_runtime_domain)
-')
+modutils_domtrans_kmod(container_runtime_domain)
 
 systemd_status_all_unit_files(container_runtime_domain)
 systemd_start_systemd_services(container_runtime_domain)
