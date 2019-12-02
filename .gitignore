@@ -1,3 +1,4 @@
 *.swp
+/build
 /tmp/*
 /container*.pp.bz2
