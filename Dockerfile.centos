@@ -7,5 +7,7 @@ RUN set -x && yum -y install \
 
 RUN mkdir -p /src
 
+ADD .bashrc /root/.bashrc
+
 WORKDIR "/src"
 VOLUME ["/src"]
