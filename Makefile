@@ -1,12 +1,18 @@
-TARGETS?=container
 MODULES?=${TARGETS:=.pp.bz2}
 SHAREDIR?=/usr/share
+DOCKER_ARGS?=
+OSDIST?=centos
+TARGETS?=container-$(OSDIST)
+DOCKERFILE?=Dockerfile.$(OSDIST)
+BUILDBOX?=selinux-dev:$(OSDIST)
+BUILDBOX_INSTANCE?=selinux-dev
+CONTAINER_RUNTIME:=$(shell command -v podman 2> /dev/null || echo docker)
 
 all: ${TARGETS:=.pp.bz2}
 
-%.pp.bz2: %.pp
+%-$(OSDIST).pp.bz2: %.pp
 	@echo Compressing $^ -\> $@
-	bzip2 -9 $^
+	bzip2 -f -9 -c $^ > $@
 
 %.pp: %.te
 	make -f ${SHAREDIR}/selinux/devel/Makefile $@
@@ -25,3 +31,17 @@ install: man
 	install -D -m 644 ${TARGETS}.pp.bz2 ${DESTDIR}${SHAREDIR}/selinux/packages/container.pp.bz2
 	install -D -m 644 container.if ${DESTDIR}${SHAREDIR}/selinux/devel/include/services/container.if
 	install -D -m 644 container_selinux.8 ${DESTDIR}${SHAREDIR}/man/man8/
+
+.PHONY: build
+build: buildbox
+	${CONTAINER_RUNTIME} run \
+		--name=${BUILDBOX_INSTANCE} \
+		--privileged \
+		-v ${PWD}:/src \
+		--env "OSDIST=$(OSDIST)" \
+		--rm ${BUILDBOX} \
+		make all
+
+.PHONY: buildbox
+buildbox:
+	${CONTAINER_RUNTIME} build -t ${BUILDBOX} -f $(DOCKERFILE) .
