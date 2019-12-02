@@ -283,12 +283,11 @@ fs_rw_onload_sockets(container_runtime_domain)
 auth_dontaudit_getattr_shadow(container_runtime_domain)
 
 init_read_state(container_runtime_domain)
-init_status(container_runtime_domain)
+init_get_system_status(container_runtime_domain)
+init_stop_system(container_runtime_domain)
+init_start_system(container_runtime_domain)
 
-ifdef(`distro_fedora', `
-  init_stop(container_runtime_domain)
-  init_start(container_runtime_domain)
-')
+init_manage_config_transient_files(container_runtime_domain)
 init_manage_config_transient_files(container_runtime_domain)
 
 logging_send_audit_msgs(container_runtime_domain)

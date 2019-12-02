@@ -1151,3 +1151,204 @@ template(`virt_sandbox_net_domain',`
 	virt_sandbox_domain($1)
 	typeattribute  $1 sandbox_net_domain;
 ')
+
+interface(`kernel_read_all_proc',`
+  gen_require(`
+    attribute proc_type;
+  ')
+
+  read_files_pattern($1, proc_type, proc_type)
+')
+
+interface(`systemd_unit_file',`
+  gen_require(`
+    attribute systemd_unit_file_type;
+  ')
+
+  typeattribute $1 systemd_unit_file_type;
+  files_type($1)
+')
+
+interface(`userdom_admin_home_dir_filetrans',`
+  gen_require(`
+    type admin_home_t;
+  ')
+
+  allow $1 admin_home_t:lnk_file read_lnk_file_perms;
+  filetrans_pattern($1, admin_home_t, $2, $3, $4)
+')
+
+interface(`userdom_manage_user_home_content',`
+  gen_require(`
+    type user_home_dir_t, user_home_t;
+    attribute user_home_type;
+  ')
+
+  files_list_home($1)
+  manage_dirs_pattern($1, { user_home_dir_t user_home_type }, user_home_type)
+  manage_files_pattern($1, { user_home_dir_t user_home_type }, user_home_type)
+  manage_lnk_files_pattern($1, { user_home_dir_t user_home_type }, user_home_type)
+  manage_sock_files_pattern($1, { user_home_dir_t user_home_type }, user_home_type)
+  manage_fifo_files_pattern($1, { user_home_dir_t user_home_type }, user_home_type)
+  filetrans_pattern($1, user_home_dir_t, user_home_t, { dir file lnk_file sock_file fifo_file })
+')
+
+interface(`term_use_all_inherited_terms',`
+  gen_require(`
+    attribute ttynode, ptynode;
+    type console_device_t, devpts_t, tty_device_t;
+  ')
+
+  allow $1 { devpts_t console_device_t tty_device_t ttynode ptynode }:chr_file rw_inherited_term_perms;
+')
+
+
+interface(`files_dontaudit_unmount_all_mountpoints',`
+  gen_require(`
+    attribute mountpoint;
+  ')
+
+  dontaudit $1 mountpoint:filesystem unmount;
+')
+
+interface(`fs_rw_onload_sockets',`
+  gen_require(`
+    type onload_fs_t;
+  ')
+
+  rw_sock_files_pattern($1, onload_fs_t, onload_fs_t)
+  allow $1 onload_fs_t:sock_file ioctl;
+')
+
+interface(`miscfiles_dontaudit_access_check_cert',`
+  gen_require(`
+    type cert_t;
+  ')
+
+  dontaudit $1 cert_t:file audit_access;
+  dontaudit $1 cert_t:dir audit_access;
+')
+
+interface(`ssh_use_ptys',`
+  gen_require(`
+    type sshd_devpts_t;
+  ')
+
+  allow $1 sshd_devpts_t:chr_file rw_inherited_chr_file_perms;
+')
+
+interface(`openvswitch_stream_connect',`
+  gen_require(`
+    type openvswitch_t, openvswitch_var_run_t;
+  ')
+
+  files_search_pids($1)
+  stream_connect_pattern($1, openvswitch_var_run_t, openvswitch_var_run_t, openvswitch_t)
+')
+
+interface(`kernel_dontaudit_setsched',`
+  gen_require(`
+    type kernel_t;
+  ')
+
+  dontaudit $1 kernel_t:process setsched;
+')
+
+interface(`kernel_mounton_messages',`
+  gen_require(`
+    type proc_kmsg_t;
+  ')
+
+  allow $1 proc_kmsg_t:file mounton;
+')
+
+interface(`kernel_mounton_all_proc',`
+  gen_require(`
+    attribute proc_type;
+  ')
+
+  allow $1 proc_type:dir mounton;
+  allow $1 proc_type:file mounton;
+')
+
+interface(`kernel_mounton_all_sysctls',`
+  gen_require(`
+    attribute sysctl_type;
+  ')
+
+  allow $1 sysctl_type:dir mounton;
+')
+
+interface(`kernel_dontaudit_access_check_proc',`
+  gen_require(`
+    type proc_t;
+  ')
+
+  dontaudit $1 proc_t:dir_file_class_set audit_access;
+')
+
+interface(`kernel_dontaudit_setattr_proc_files',`
+  gen_require(`
+    type proc_t;
+  ')
+
+  dontaudit $1 proc_t:file setattr;
+')
+
+interface(`dev_getattr_all',`
+  gen_require(`
+    attribute device_node;
+    type device_t;
+  ')
+
+  allow $1 { device_t device_node }:dir_file_class_set getattr;
+')
+
+interface(`dev_getattr_sysfs_fs',`
+  gen_require(`
+    type sysfs_t;
+  ')
+
+  allow $1 sysfs_t:filesystem getattr;
+')
+
+interface(`dev_read_mtrr',`
+  gen_require(`
+    type device_t, mtrr_device_t;
+  ')
+
+  read_files_pattern($1, device_t, mtrr_device_t)
+  read_chr_files_pattern($1, device_t, mtrr_device_t)
+')
+
+interface(`files_getattr_isid_type_dirs',`
+  gen_require(`
+    type unlabeled_t;
+  ')
+
+  allow $1 unlabeled_t:dir getattr;
+')
+
+interface(`files_manage_isid_type_dirs',`
+  gen_require(`
+    type unlabeled_t;
+  ')
+
+  allow $1 unlabeled_t:dir manage_dir_perms;
+')
+
+interface(`files_manage_isid_type_files',`
+  gen_require(`
+    type unlabeled_t;
+  ')
+
+  allow $1 unlabeled_t:dir manage_file_perms;
+')
+
+interface(`files_manage_isid_type_symlinks',`
+  gen_require(`
+    type unlabeled_t;
+  ')
+
+  allow $1 unlabeled_t:dir manage_symlink_perms;
+')

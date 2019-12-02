@@ -1,0 +1,16 @@
+FROM debian:buster
+
+RUN set -x && apt update && apt -y install --no-install-recommends \
+	selinux-policy-default \
+	selinux-policy-dev \
+	setools \
+	bzip2 \
+	less \
+	make
+
+RUN mkdir -p /src
+
+ADD .bashrc /root/.bashrc
+
+WORKDIR "/src"
+VOLUME ["/src"]
