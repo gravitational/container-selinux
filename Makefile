@@ -1,11 +1,10 @@
 MODULES?=${TARGETS:=.pp.bz2}
 SHAREDIR?=/usr/share
-DOCKER_ARGS?=
 TARGETS?=$(OUTPUT)/container
 BUILDBOX?=selinux-dev:centos
 BUILDBOX_INSTANCE?=selinux-dev
+OUTPUT?=output
 CONTAINER_RUNTIME:=$(shell command -v podman 2> /dev/null || echo docker)
-OUTPUT:=output
 
 all: build
 
