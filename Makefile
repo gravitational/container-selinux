@@ -1,27 +1,53 @@
-TARGETS?=container
 MODULES?=${TARGETS:=.pp.bz2}
 SHAREDIR?=/usr/share
+DOCKER_ARGS?=
+TARGETS?=$(OUTPUT)/container
+BUILDBOX?=selinux-dev:fedora
+BUILDBOX_INSTANCE?=selinux-dev
+CONTAINER_RUNTIME:=$(shell command -v podman 2> /dev/null || echo docker)
+OUTPUT:=output
 
-all: ${TARGETS:=.pp.bz2}
+all: build
 
-%.pp.bz2: %.pp
+$(OUTPUT)/%.pp.bz2: $(OUTPUT)/%.pp | $(OUTPUT)
 	@echo Compressing $^ -\> $@
-	bzip2 -9 $^
+	bzip2 -f -9 -c $^ > $@
 
-%.pp: %.te
-	make -f ${SHAREDIR}/selinux/devel/Makefile $@
+$(OUTPUT)/%.pp: %.te | $(OUTPUT)
+	make -f ${SHAREDIR}/selinux/devel/Makefile $(@F)
+	mv $(@F) $@
 
+.PHONY: clean
 clean:
 	rm -f *~  *.tc *.pp *.pp.bz2
 	rm -rf tmp *.tar.gz
 
+.PHONY: man
 man: install-policy
 	sepolicy manpage --path . --domain ${TARGETS}_t
 
+.PHONY: install-policy
 install-policy: all
 	semodule -i ${TARGETS}.pp.bz2
 
+.PHONY: install
 install: man
 	install -D -m 644 ${TARGETS}.pp.bz2 ${DESTDIR}${SHAREDIR}/selinux/packages/container.pp.bz2
 	install -D -m 644 container.if ${DESTDIR}${SHAREDIR}/selinux/devel/include/services/container.if
 	install -D -m 644 container_selinux.8 ${DESTDIR}${SHAREDIR}/man/man8/
+
+.PHONY: build
+build: buildbox
+	${CONTAINER_RUNTIME} run \
+		--name=${BUILDBOX_INSTANCE} \
+		--privileged \
+		-v ${PWD}:/src \
+		--rm ${BUILDBOX} \
+		make ${TARGETS:=.pp.bz2}
+
+.PHONY: buildbox
+buildbox:
+	${CONTAINER_RUNTIME} build -t ${BUILDBOX} -f Dockerfile .
+
+$(OUTPUT):
+	mkdir -p $@
