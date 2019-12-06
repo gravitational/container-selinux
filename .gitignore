@@ -2,3 +2,4 @@
 /build
 /tmp/*
 /container*.pp.bz2
+/output/*
