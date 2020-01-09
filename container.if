@@ -859,36 +859,6 @@ template(`container_domain_template',`
 
 ########################################
 ## <summary>
-##	Creates types and rules for a basic
-##	container process domain with networking extensions.
-## </summary>
-## <param name="prefix">
-##	<summary>
-##	Prefix for the domain.
-##	</summary>
-## </param>
-#
-template(`container_net_domain_template',`
-	gen_require(`
-		attribute container_domain;
-		attribute container_net_domain;
-		type container_runtime_t;
-		type container_var_lib_t;
-		type container_share_t;
-	')
-
-	type $1_t, container_domain, container_net_domain;
-	domain_type($1_t)
-	domain_user_exemption_target($1_t)
-	mls_rangetrans_target($1_t)
-	mcs_constrained($1_t)
-	role system_r types $1_t;
-
-	kernel_read_all_proc($1_t)
-')
-
-########################################
-## <summary>
 ##	Read and write a spc_t unnamed pipe.
 ## </summary>
 ## <param name="domain">
