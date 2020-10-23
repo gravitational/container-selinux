@@ -1,1 +1,5 @@
-/container-selinux-e06212c.tar.gz
+*.swp
+/build
+/tmp/*
+/container*.pp.bz2
+/output/*
